@@ -41,16 +41,27 @@ private readonly ILogger<UserController> _logger;
         _logger.LogInformation("a new User with UserID {UserID} has been added.", user.UserID);
         return Ok();
     }
-[HttpGet("GetUser/{id}")]
+[HttpGet("GetUser")]
+public async Task<IActionResult> GetUser([FromQuery] LoginModel loginModel)
+{
+    var user = await _userRepo.GetUser(loginModel);
+    if (user == null)
+    {
+        return NotFound();
+    }
+    return Ok(user);
+}
+[HttpGet("GetUserById/{id}")]
      public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _userRepo.GetUser(id);
+            var user = await _userRepo.GetUserById(id);
             if (user == null)
             {
                 return NotFound();
             }
             return Ok(user);
         }
+
     [HttpGet("getAllUsers")]
     public async Task<ActionResult<List<User>>> GetAllUsers()
     {
@@ -65,7 +76,7 @@ public async Task<IActionResult> UpdateUser(int UserID,User user)
     {
         _logger.LogInformation("Metode UpdateUser called at {DT}", DateTime.UtcNow.ToLongTimeString());
      //finds the User
-     var exists = await _userRepo.GetUser(UserID);
+     var exists = await _userRepo.GetUserById(UserID);
          if (exists == null)
      {    
         return NotFound();

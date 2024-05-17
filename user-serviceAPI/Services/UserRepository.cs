@@ -28,7 +28,11 @@ public class UserRepository : IUserRepository
         await _userCollection.InsertOneAsync(user);
 
     
-    public async Task<User> GetUser(int id) =>
+    public async Task<User> GetUser(LoginModel loginModel) =>
+
+        await _userCollection.Find(u => u.UserName == loginModel.UserName).FirstOrDefaultAsync();
+
+   public async Task<User> GetUserById(int id) =>
 
         await _userCollection.Find(u => u.UserID == id).FirstOrDefaultAsync();
 
