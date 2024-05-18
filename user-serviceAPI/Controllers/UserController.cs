@@ -38,22 +38,31 @@ private readonly ILogger<UserController> _logger;
     {
         _logger.LogInformation("Metode AddUser called at {DT}", DateTime.UtcNow.ToLongTimeString());
         _userRepo.AddUser(user);
-        _logger.LogInformation("a new User with UserID {UserID} has been added.", user.UserID);
+        _logger.LogInformation("a new User with Username:" + user.UserName +" and UserID:" + user.UserID + " has been added.");
         return Ok();
     }
 [HttpGet("GetUser")]
 public async Task<IActionResult> GetUser([FromQuery] LoginModel loginModel)
 {
     var user = await _userRepo.GetUser(loginModel);
+    if (user != null)
+        {
+            _logger.LogInformation("User found");
+            return Ok(user);
+        }
     if (user == null)
     {
-        return NotFound();
+        _logger.LogInformation(loginModel.UserName + " not found");
+        return NotFound(loginModel.UserName + " not found");
     }
     return Ok(user);
 }
 [HttpGet("GetUserById/{id}")]
      public async Task<ActionResult<User>> GetUser(int id)
         {
+            _logger.LogInformation("Metode GetUserById called at {DT}", DateTime.UtcNow.ToLongTimeString());
+
+
             var user = await _userRepo.GetUserById(id);
             if (user == null)
             {
@@ -66,7 +75,7 @@ public async Task<IActionResult> GetUser([FromQuery] LoginModel loginModel)
     public async Task<ActionResult<List<User>>> GetAllUsers()
     {
 
-        _logger.LogInformation("Metode GetAllUser called at {DT}", DateTime.UtcNow.ToLongTimeString());
+        _logger.LogInformation("Metode GetAllUsers called at {DT}", DateTime.UtcNow.ToLongTimeString());
 
         var list = await _userRepo.GetAllUsers();
         return Ok(list);
