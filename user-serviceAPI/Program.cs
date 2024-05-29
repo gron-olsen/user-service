@@ -1,10 +1,21 @@
 using userServiceAPI.Services;
 using userServiceAPI.Models;
+using NLog;
+using NLog.Web;
 
+
+var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+logger.Debug("init main");
+
+try
+{
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+ // Rydder standard logging providers
+    builder.Logging.ClearProviders();
 
+    // Tilføjer og konfigurerer NLog som logging provider
+    builder.Host.UseNLog();
 
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
 
@@ -27,3 +38,14 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+}
+catch (Exception ex)
+{
+    logger.Error(ex, "Stopped program because of exception");
+    throw;
+}
+finally
+{
+    NLog.LogManager.Shutdown();
+}

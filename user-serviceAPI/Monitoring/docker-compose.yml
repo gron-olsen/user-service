@@ -10,6 +10,8 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - loki
+    volumes:
+      - lokidata:/loki
 
   grafana:
     image: grafana/grafana:latest
@@ -24,15 +26,16 @@ services:
       dockerfile: dockerfile
     image: caspfh/user-serviceapi:latest
     ports:
-      - "5289:8081"
+      - "5289:8080"
     expose: 
-      - "8081"
+      - "8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - connectionString=mongodb://admin:1234@mongodb:27017/
-      - database=catalogDB
-      - collection=catalogCol
-
+      - connectionString=mongodb://admin:1234@mongodb:27017/userDB?authSource=admin
+      - database=userDB
+      - collection=userCol
+    labels:
+      - stream
     networks:
       - loki
     depends_on:
@@ -64,3 +67,4 @@ services:
 
 volumes:
   mongodbdata:
+  lokidata:
